@@ -3,5 +3,9 @@
             [lab1.core :refer :all]))
 
 (deftest a-test
-  (testing "FIXME, I fail."
-    (is (= 0 1))))
+  (testing "TEST1"
+    (is (= 1 1))
+    (is (= (+ 1 2) 3))
+    (is (= (- 1 1) 0)))
+  (testing "TEST2"
+    (is (= 2 3))))
