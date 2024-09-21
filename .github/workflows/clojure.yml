@@ -15,11 +15,13 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-
-    - name: Set up Clojure
-      uses: DeLaGuardo/setup-clojure@v1
-      with:
-        clojure_version: '1.12.0.1479'
-
-    - name: Change working directory
-      run: cd lab1 && lein test
+      
+    - name: Install Leiningen
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y leiningen
+    
+    - name: Change directory and run tests
+      run: |
+        cd lab1
+        lein test
