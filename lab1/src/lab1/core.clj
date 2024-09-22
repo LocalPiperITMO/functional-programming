@@ -47,8 +47,18 @@
                     current-prod (product-reduce (map #(Character/digit % 10) current-substr))]
                 (helper (inc idx) (max max-prod current-prod)))))]
     (helper 0 0)))
-(defn largest-product-in-series-modular [limit]
-  0)
+
+;; Modular Implementation
+(defn generate-subsequences [seq length]
+  (map #(take length (drop % seq)) (range (- (count seq) length))))
+
+(defn find-max-product [subsequences]
+  (reduce max 0 (map product-reduce subsequences)))
+
+(defn largest-product-in-series-modular []
+  (let [digits (map #(Character/digit % 10) problem-8-input)
+        subsequences (generate-subsequences digits 13)]
+    (find-max-product subsequences)))
 
 ;; Map Solution
 (defn product-apply [digits]
@@ -81,7 +91,7 @@
   ;; Problem 8
   (println "Problem 8 using Basic Recursion:" (largest-product-in-series-basic-recursion 0 0))
   (println "Problem 8 using Tail Recursion:" (largest-product-in-series-tail-recursion))
-  (println "Problem 8 using Modular Realization:" (largest-product-in-series-modular 0))
+  (println "Problem 8 using Modular Realization:" (largest-product-in-series-modular))
   (println "Problem 8 using Map:" (largest-product-in-series-map))
   (println "Problem 8 using Loop:" (largest-product-in-series-loop 0))
   (println "Problem 8 using Lazy Collections:" (largest-product-in-series-lazy 0))
