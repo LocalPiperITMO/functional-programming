@@ -10,7 +10,7 @@
     (is (= ans8 (largest-product-in-series-basic-recursion)))
     (is (= ans8 (largest-product-in-series-tail-recursion 0 0)))
     (is (= ans8 (largest-product-in-series-modular 0)))
-    (is (= ans8 (largest-product-in-series-map 0)))
+    (is (= ans8 (largest-product-in-series-map)))
     (is (= ans8 (largest-product-in-series-loop 0)))
     (is (= ans8 (largest-product-in-series-lazy 0)))))
 
