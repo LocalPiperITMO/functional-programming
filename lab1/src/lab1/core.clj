@@ -68,8 +68,16 @@
   (let [digits (map #(Character/digit % 10) problem-8-input)]
     (->> (map #(product-apply (take 13 (drop % digits))) (range (- (count digits) 12)))
          (reduce max 0))))
-(defn largest-product-in-series-loop [limit]
-  0)
+
+;; Loop Implementation
+(defn largest-product-in-series-loop []
+  (let [digits (map #(Character/digit % 10) problem-8-input)]
+    (loop [idx 0 max-prod 0]
+      (if (>= idx (- (count digits) 12))
+        max-prod
+        (let [current-prod (product-reduce (take 13 (drop idx digits)))]
+          (recur (inc idx) (max max-prod current-prod)))))))
+
 (defn largest-product-in-series-lazy [limit]
   0)
 
@@ -93,7 +101,7 @@
   (println "Problem 8 using Tail Recursion:" (largest-product-in-series-tail-recursion))
   (println "Problem 8 using Modular Realization:" (largest-product-in-series-modular))
   (println "Problem 8 using Map:" (largest-product-in-series-map))
-  (println "Problem 8 using Loop:" (largest-product-in-series-loop 0))
+  (println "Problem 8 using Loop:" (largest-product-in-series-loop))
   (println "Problem 8 using Lazy Collections:" (largest-product-in-series-lazy 0))
 
   ;; Problem 23

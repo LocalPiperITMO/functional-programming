@@ -11,7 +11,7 @@
     (is (= ans8 (largest-product-in-series-tail-recursion)))
     (is (= ans8 (largest-product-in-series-modular)))
     (is (= ans8 (largest-product-in-series-map)))
-    (is (= ans8 (largest-product-in-series-loop 0)))
+    (is (= ans8 (largest-product-in-series-loop)))
     (is (= ans8 (largest-product-in-series-lazy 0)))))
 
 (deftest problem23-tests
