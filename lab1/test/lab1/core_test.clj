@@ -12,7 +12,7 @@
     (is (= ans8 (largest-product-in-series-modular)))
     (is (= ans8 (largest-product-in-series-map)))
     (is (= ans8 (largest-product-in-series-loop)))
-    (is (= ans8 (largest-product-in-series-lazy 0)))))
+    (is (= ans8 (largest-product-in-series-lazy)))))
 
 (deftest problem23-tests
   (testing "Project Euler Problem 23: Non-Abundant Sums"

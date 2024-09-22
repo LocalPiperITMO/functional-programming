@@ -78,8 +78,14 @@
         (let [current-prod (product-reduce (take 13 (drop idx digits)))]
           (recur (inc idx) (max max-prod current-prod)))))))
 
-(defn largest-product-in-series-lazy [limit]
-  0)
+;; Infinite Lists
+(defn lazy-max-product [digits]
+  (let [subsequences (map #(take 13 (drop % digits)) (take (- (count digits) 12) (iterate inc 0)))] ; Limit the range
+    (reduce max 0 (map product-reduce subsequences))))
+
+(defn largest-product-in-series-lazy []
+  (let [digits (map #(Character/digit % 10) problem-8-input)]
+    (lazy-max-product digits)))
 
 ;; Problem 23
 (defn non-abundant-sums-basic-recursion [n]
@@ -102,7 +108,7 @@
   (println "Problem 8 using Modular Realization:" (largest-product-in-series-modular))
   (println "Problem 8 using Map:" (largest-product-in-series-map))
   (println "Problem 8 using Loop:" (largest-product-in-series-loop))
-  (println "Problem 8 using Lazy Collections:" (largest-product-in-series-lazy 0))
+  (println "Problem 8 using Lazy Collections:" (largest-product-in-series-lazy))
 
   ;; Problem 23
   (println "Problem 23 using Basic Recursion:" (non-abundant-sums-basic-recursion 0))
