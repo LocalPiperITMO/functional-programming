@@ -126,7 +126,7 @@
 (defn filter-non-abundant [seq abundant-set]
   (filter #(not (can-be-sum-of-two-abundant? % abundant-set)) seq))
 
-(defn non-abundant-sums-modular [] 
+(defn non-abundant-sums-modular []
   (let [max-n problem-23-input
         num-seq (generate-sequence max-n)
         abundant-seq (filter-abundant num-seq)
@@ -135,7 +135,29 @@
         res (reduce + non-abundant-seq)]
     res))
 
-(defn non-abundant-sums-map [] 0)
+;; Map Solution
+(defn proper-divisors [n]
+  (filter #(zero? (mod n %)) (range 1 (inc (quot n 2)))))
+
+(defn abundant? [n]
+  (> (reduce + (proper-divisors n)) n))
+
+(defn generate-abundant-numbers [limit]
+  (filter abundant? (range 1 (inc limit))))
+
+(defn can-be-sum-of-two-abundant-map? [n abundant-numbers]
+  (some #(let [complement (- n %)]
+           (and (pos? complement)
+                (contains? abundant-numbers complement)))
+        abundant-numbers))
+(defn non-abundant-sums-map []
+  (let [limit problem-23-input
+        abundant-numbers (set (generate-abundant-numbers limit))
+        sum-checks (map #(can-be-sum-of-two-abundant-map? % abundant-numbers) (range 1 (inc limit)))
+        transformed-numbers (map (fn [n can-sum] (if can-sum 0 n))
+                                 (range 1 (inc limit))
+                                 sum-checks)]
+    (reduce + transformed-numbers)))
 
 ;; Loop Implementation
 (defn sum-divisors [n]
