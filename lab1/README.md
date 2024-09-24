@@ -130,37 +130,58 @@ int main() {
 Задача 23 связана с обильными числами и нахождением суммы всех чисел, которые не могут быть записаны как сумма двух обильных чисел.
 Код на языке C++:
 ```cpp
-#include <fstream>
+#include <cmath>
 #include <iostream>
-
+#include <vector>
 using namespace std;
 
+int divsum(int n) {
+  if (n < 2)
+    return 0;
+  int sum = 1;
+  for (int i = 2; i * i <= n; ++i) {
+    if (n % i == 0) {
+      sum += i;
+      if (i != n / i) {
+        sum += n / i;
+      }
+    }
+  }
+  return sum;
+}
+
+void generate(vector<int> &abundantNumbers, int limit) {
+  for (int i = 12; i <= limit; ++i)
+    if (divsum(i) > i)
+      abundantNumbers.push_back(i);
+}
+
 int main() {
-  ifstream infile("input8.txt");
-  string s;
-  infile >> s;
-  int n = s.size();
-  long long prod = 1, res = 0;
-  int prod_len = 0;
-  for (int i = 0; i < n; ++i) {
-    prod *= (s[i] - '0');
-    ++prod_len;
-    if (prod == 0) {
-      prod = 1;
-      prod_len = 0;
-      continue;
+  const int LIMIT = 28213;
+  vector<int> abundantNumbers;
+  generate(abundantNumbers, LIMIT);
+  vector<bool> canBeWritten(LIMIT + 1, false);
+
+  for (int i = 0; i < abundantNumbers.size(); ++i) {
+    for (int j = i; j < abundantNumbers.size(); ++j) {
+      long long sum = abundantNumbers[i] + abundantNumbers[j];
+      if (sum <= LIMIT) {
+        canBeWritten[sum] = true;
+      } else {
+        break;
+      }
     }
-    while (prod_len > 13) {
-      prod /= (s[i - 13] - '0');
-      --prod_len;
-    }
-    if (prod_len == 13) {
-      res = (res < prod) ? prod : res;
+  }
+  long long res = 0;
+  for (long long i = 1; i <= LIMIT; ++i) {
+    if (!canBeWritten[i]) {
+      res += i;
     }
   }
   cout << res << endl;
   return 0;
 }
+
 ```
 ### 1. Хвостовая рекурсия
 
