@@ -104,7 +104,37 @@
 
 (defn non-abundant-sums-basic-recursion [] 0)
 (defn non-abundant-sums-tail-recursion [] 0)
-(defn non-abundant-sums-modular [] 0)
+;; Modular
+(defn generate-sequence [limit]
+  (range 1 (inc limit)))
+
+(defn find-divisors [n]
+  (filter #(zero? (mod n %)) (generate-sequence (quot n 2))))
+
+(defn sum-divisors-modular [n]
+  (apply + (find-divisors n)))
+
+(defn is-abundant? [n]
+  (> (sum-divisors-modular n) n))
+
+(defn filter-abundant [seq]
+  (filter is-abundant? seq))
+
+(defn can-be-sum-of-two-abundant? [n num-set]
+  (some #(contains? num-set (- n %)) num-set))
+
+(defn filter-non-abundant [seq abundant-set]
+  (filter #(not (can-be-sum-of-two-abundant? % abundant-set)) seq))
+
+(defn non-abundant-sums-modular [] 
+  (let [max-n problem-23-input
+        num-seq (generate-sequence max-n)
+        abundant-seq (filter-abundant num-seq)
+        abundant-set (set abundant-seq)
+        non-abundant-seq (filter-non-abundant num-seq abundant-set)
+        res (reduce + non-abundant-seq)]
+    res))
+
 (defn non-abundant-sums-map [] 0)
 
 ;; Loop Implementation
