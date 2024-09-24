@@ -226,6 +226,43 @@ int main() {
   (filter abundant? (rest (iterate inc 1))))
 ```
 
+## Тестирование
+[Ссылка на тесты](/test/lab1/core-test.clj)
+Прохождение тестов:
+```
+lein test lab1.core-test
+
+Ran 2 tests containing 12 assertions.
+0 failures, 0 errors.
+
+```
+Время выполнения программ:
+```
+"Elapsed time: 143.629165 msecs"
+Problem 8 using Basic Recursion: 23514624000
+"Elapsed time: 138.721397 msecs"
+Problem 8 using Tail Recursion: 23514624000
+"Elapsed time: 52.729894 msecs"
+Problem 8 using Modular Realization: 23514624000
+"Elapsed time: 50.318837 msecs"
+Problem 8 using Map: 23514624000
+"Elapsed time: 125.844356 msecs"
+Problem 8 using Loop: 23514624000
+"Elapsed time: 48.281642 msecs"
+Problem 8 using Lazy Collections: 23514624000
+"Elapsed time: 0.008635 msecs"
+Problem 23 using Basic Recursion: 4179871
+"Elapsed time: 24640.391307 msecs"
+Problem 23 using Tail Recursion: 4179871
+"Elapsed time: 25325.994854 msecs"
+Problem 23 using Modular Realization: 4179871
+"Elapsed time: 23472.976114 msecs"
+Problem 23 using Map: 4179871
+"Elapsed time: 61029.236202 msecs"
+Problem 23 using Loop: 4179871
+"Elapsed time: 23742.797796 msecs"
+Problem 23 using Lazy Collections: 4179871
+```
 ## Заключение
 
 Представленные решения демонстрируют различные подходы к решению задач с использованием функционального программирования на Clojure. Эти примеры показывают, как рекурсия, циклы и функции высшего порядка могут эффективно решать математические задачи.
