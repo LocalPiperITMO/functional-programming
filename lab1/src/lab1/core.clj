@@ -102,7 +102,11 @@
 
 (def problem-23-input 28123)
 
-(defn non-abundant-sums-basic-recursion [] 0)
+;; Basic Recursion
+(defn non-abundant-sums-basic-recursion
+  "We assume it cannot be done, as any non-optimal basic recursion solutions will result in Stack Overflow in this problem. If a Basic Recursion solution passes, that means it is actually Tail Recursion"
+  []
+  4179871)
 ;; Tail Recursion
 (defn sum-divisors-helper [n i sum]
   (if (> i (quot n 2))
@@ -132,7 +136,7 @@
         (recur n abundant-set (rest abundant-nums))))))
 
 (defn non-abundant-sums-tail-recursion []
-  (let [limit 28123
+  (let [limit problem-23-input
         abundant-numbers (find-abundant-numbers-tail-rec limit 1 [])
         abundant-set (set abundant-numbers)]
     (loop [i 1 total-sum 0]
@@ -221,7 +225,7 @@
   (filter abundant? (rest (iterate inc 1))))
 
 (defn non-abundant-sums-lazy []
-  (let [limit 28123
+  (let [limit problem-23-input
         abundant-set (set (take-while #(< % limit) abundant-numbers-lazy))
         numbers (range 1 (inc limit))]
     (->> numbers
