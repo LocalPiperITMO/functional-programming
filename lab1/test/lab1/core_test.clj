@@ -16,11 +16,11 @@
 
 (deftest problem23-tests
   (testing "Project Euler Problem 23: Non-Abundant Sums"
-    (is (= ans23 (non-abundant-sums-basic-recursion 0)))
-    (is (= ans23 (non-abundant-sums-tail-recursion 0 0)))
-    (is (= ans23 (non-abundant-sums-modular 0)))
-    (is (= ans23 (non-abundant-sums-map 0)))
-    (is (= ans23 (non-abundant-sums-loop 0)))
-    (is (= ans23 (non-abundant-sums-lazy 0)))))
+    (is (= ans23 (non-abundant-sums-basic-recursion)))
+    (is (= ans23 (non-abundant-sums-tail-recursion)))
+    (is (= ans23 (non-abundant-sums-modular)))
+    (is (= ans23 (non-abundant-sums-map)))
+    (is (= ans23 (non-abundant-sums-loop)))
+    (is (= ans23 (non-abundant-sums-lazy)))))
 
 

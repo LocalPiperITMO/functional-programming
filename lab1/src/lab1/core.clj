@@ -100,21 +100,36 @@
 ;; 
 ;; Find the sum of all the positive integers which cannot be written as the sum of two abundant numbers.
 
-(defn non-abundant-sums-basic-recursion [n]
-  0)
-(defn non-abundant-sums-tail-recursion [n acc]
-  0)
-(defn non-abundant-sums-modular [limit]
-  0)
-(defn non-abundant-sums-map [limit]
-  0)
-(defn non-abundant-sums-loop [limit]
-  0)
-(defn non-abundant-sums-lazy [limit]
-  0)
+(def problem-23-input 28123)
+
+(defn non-abundant-sums-basic-recursion [] 0)
+(defn non-abundant-sums-tail-recursion [] 0)
+(defn non-abundant-sums-modular [] 0)
+(defn non-abundant-sums-map [] 0)
+
+;; Loop Implementation
+(defn sum-divisors [n]
+  (reduce + (filter #(zero? (mod n %)) (range 1 (inc (quot n 2))))))
+
+(defn abundant-numbers [max-n]
+  (set (filter #(> (sum-divisors %) %) (range 1 (inc max-n)))))
+
+(defn non-abundant-sums-loop []
+  (let [max-n problem-23-input
+        abundant-set (abundant-numbers max-n)
+        non-abundant-sum (atom 0)]
+    (let [abundant-sums (set (for [x abundant-set
+                                   y abundant-set]
+                               (+ x y)))]
+      (doseq [n (range 1 (inc max-n))]
+        (when (not (contains? abundant-sums n))
+          (swap! non-abundant-sum + n))))
+    @non-abundant-sum))
+
+(defn non-abundant-sums-lazy [] 0)
 
 (defn -main []
-  ;; Problem 8
+;; Problem 8
   (println "Problem 8 using Basic Recursion:" (largest-product-in-series-basic-recursion 0 0))
   (println "Problem 8 using Tail Recursion:" (largest-product-in-series-tail-recursion))
   (println "Problem 8 using Modular Realization:" (largest-product-in-series-modular))
@@ -123,10 +138,10 @@
   (println "Problem 8 using Lazy Collections:" (largest-product-in-series-lazy))
 
   ;; Problem 23
-  (println "Problem 23 using Basic Recursion:" (non-abundant-sums-basic-recursion 0))
-  (println "Problem 23 using Tail Recursion:" (non-abundant-sums-tail-recursion 0 0))
-  (println "Problem 23 using Modular Realization:" (non-abundant-sums-modular 0))
-  (println "Problem 23 using Map:" (non-abundant-sums-map 0))
-  (println "Problem 23 using Loop:" (non-abundant-sums-loop 0))
-  (println "Problem 23 using Lazy Collections:" (non-abundant-sums-lazy 0)))
+  (println "Problem 23 using Basic Recursion:" (non-abundant-sums-basic-recursion))
+  (println "Problem 23 using Tail Recursion:" (non-abundant-sums-tail-recursion))
+  (println "Problem 23 using Modular Realization:" (non-abundant-sums-modular))
+  (println "Problem 23 using Map:" (non-abundant-sums-map))
+  (println "Problem 23 using Loop:" (non-abundant-sums-loop))
+  (println "Problem 23 using Lazy Collections:" (non-abundant-sums-lazy)))
 
