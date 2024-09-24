@@ -202,23 +202,52 @@
     (reduce + transformed-numbers)))
 
 ;; Loop Implementation
-(defn sum-divisors [n]
-  (reduce + (filter #(zero? (mod n %)) (range 1 (inc (quot n 2))))))
+(defn proper-divisors-loop [n]
+  (loop [i 1
+         sum 0]
+    (if (< i n)
+      (if (zero? (mod n i))
+        (recur (inc i) (+ sum i))
+        (recur (inc i) sum))
+      sum)))
 
-(defn abundant-numbers [max-n]
-  (set (filter #(> (sum-divisors %) %) (range 1 (inc max-n)))))
+(defn abundant-loop? [n]
+  (> (proper-divisors-loop n) n))
+
+(defn abundant-numbers [limit]
+  (for [n (range 1 (inc limit)) :when (abundant-loop? n)] n))
+
+(defn abundant-sums [abundants limit]
+  (loop [x-iter (seq abundants)
+         sums #{}]
+    (if x-iter
+      (let [x (first x-iter)
+            new-sums (loop [y-iter (seq abundants)
+                            current-sums sums]
+                       (if y-iter
+                         (let [y (first y-iter)
+                               s (+ x y)]
+                           (if (<= s limit)
+                             (recur (next y-iter) (conj current-sums s))
+                             (recur (next y-iter) current-sums)))
+                         current-sums))]
+        (recur (next x-iter) new-sums))
+      sums)))
+
+(defn find-non-abundant-sum [limit sums]
+  (loop [i 1
+         result 0]
+    (if (> i limit)
+      result
+      (if (contains? sums i)
+        (recur (inc i) result)
+        (recur (inc i) (+ result i))))))
 
 (defn non-abundant-sums-loop []
-  (let [max-n problem-23-input
-        abundant-set (abundant-numbers max-n)
-        non-abundant-sum (atom 0)]
-    (let [abundant-sums (set (for [x abundant-set
-                                   y abundant-set]
-                               (+ x y)))]
-      (doseq [n (range 1 (inc max-n))]
-        (when (not (contains? abundant-sums n))
-          (swap! non-abundant-sum + n))))
-    @non-abundant-sum))
+  (let [limit problem-23-input
+        abundants (abundant-numbers limit)
+        sums (abundant-sums abundants limit)]
+    (find-non-abundant-sum limit sums)))
 
 ;; Infinite Collections
 (def abundant-numbers-lazy
@@ -234,18 +263,18 @@
 
 (defn -main []
 ;; Problem 8
-  (println "Problem 8 using Basic Recursion:" (largest-product-in-series-basic-recursion 0 0))
-  (println "Problem 8 using Tail Recursion:" (largest-product-in-series-tail-recursion))
-  (println "Problem 8 using Modular Realization:" (largest-product-in-series-modular))
-  (println "Problem 8 using Map:" (largest-product-in-series-map))
-  (println "Problem 8 using Loop:" (largest-product-in-series-loop))
-  (println "Problem 8 using Lazy Collections:" (largest-product-in-series-lazy))
+  (println "Problem 8 using Basic Recursion:" (time (largest-product-in-series-basic-recursion 0 0)))
+  (println "Problem 8 using Tail Recursion:" (time (largest-product-in-series-tail-recursion)))
+  (println "Problem 8 using Modular Realization:" (time (largest-product-in-series-modular)))
+  (println "Problem 8 using Map:" (time (largest-product-in-series-map)))
+  (println "Problem 8 using Loop:" (time (largest-product-in-series-loop)))
+  (println "Problem 8 using Lazy Collections:" (time (largest-product-in-series-lazy)))
 
   ;; Problem 23
-  (println "Problem 23 using Basic Recursion:" (non-abundant-sums-basic-recursion))
-  (println "Problem 23 using Tail Recursion:" (non-abundant-sums-tail-recursion))
-  (println "Problem 23 using Modular Realization:" (non-abundant-sums-modular))
-  (println "Problem 23 using Map:" (non-abundant-sums-map))
-  (println "Problem 23 using Loop:" (non-abundant-sums-loop))
-  (println "Problem 23 using Lazy Collections:" (non-abundant-sums-lazy)))
+  (println "Problem 23 using Basic Recursion:" (time (non-abundant-sums-basic-recursion)))
+  (println "Problem 23 using Tail Recursion:" (time (non-abundant-sums-tail-recursion)))
+  (println "Problem 23 using Modular Realization:" (time (non-abundant-sums-modular)))
+  (println "Problem 23 using Map:" (time (non-abundant-sums-map)))
+  (println "Problem 23 using Loop:" (time (non-abundant-sums-loop)))
+  (println "Problem 23 using Lazy Collections:" (time (non-abundant-sums-lazy))))
 
