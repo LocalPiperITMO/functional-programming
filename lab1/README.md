@@ -18,6 +18,40 @@
 ## Решения для Задачи 8
 
 Задача 8 заключается в нахождении наибольшего произведения тринадцати последовательных цифр в строке из 1000 цифр. Приведено несколько методов решения задачи, включая рекурсию, хвостовую рекурсию, модульные решения и ленивые коллекции.
+Код на языке C++:
+```cpp
+#include <fstream>
+#include <iostream>
+
+using namespace std;
+
+int main() {
+  ifstream infile("input8.txt");
+  string s;
+  infile >> s;
+  int n = s.size();
+  long long prod = 1, res = 0;
+  int prod_len = 0;
+  for (int i = 0; i < n; ++i) {
+    prod *= (s[i] - '0');
+    ++prod_len;
+    if (prod == 0) {
+      prod = 1;
+      prod_len = 0;
+      continue;
+    }
+    while (prod_len > 13) {
+      prod /= (s[i - 13] - '0');
+      --prod_len;
+    }
+    if (prod_len == 13) {
+      res = (res < prod) ? prod : res;
+    }
+  }
+  cout << res << endl;
+  return 0;
+}
+```
 
 ### 1. Простой рекурсивный подход
 
@@ -94,7 +128,40 @@
 ## Решения для Задачи 23
 
 Задача 23 связана с обильными числами и нахождением суммы всех чисел, которые не могут быть записаны как сумма двух обильных чисел.
+Код на языке C++:
+```cpp
+#include <fstream>
+#include <iostream>
 
+using namespace std;
+
+int main() {
+  ifstream infile("input8.txt");
+  string s;
+  infile >> s;
+  int n = s.size();
+  long long prod = 1, res = 0;
+  int prod_len = 0;
+  for (int i = 0; i < n; ++i) {
+    prod *= (s[i] - '0');
+    ++prod_len;
+    if (prod == 0) {
+      prod = 1;
+      prod_len = 0;
+      continue;
+    }
+    while (prod_len > 13) {
+      prod /= (s[i - 13] - '0');
+      --prod_len;
+    }
+    if (prod_len == 13) {
+      res = (res < prod) ? prod : res;
+    }
+  }
+  cout << res << endl;
+  return 0;
+}
+```
 ### 1. Хвостовая рекурсия
 
 Для нахождения обильных чисел используется хвостовая рекурсия:
