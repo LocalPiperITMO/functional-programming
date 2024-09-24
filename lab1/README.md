@@ -248,7 +248,8 @@ int main() {
 ```
 
 ## Тестирование
-[Ссылка на тесты](/test/lab1/core-test.clj)
+[Ссылка на тесты](/lab1/test/lab1/core-test.clj)
+
 Прохождение тестов:
 ```
 lein test lab1.core-test
