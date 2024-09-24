@@ -178,7 +178,17 @@
           (swap! non-abundant-sum + n))))
     @non-abundant-sum))
 
-(defn non-abundant-sums-lazy [] 0)
+;; Infinite Collections
+(def abundant-numbers-lazy
+  (filter abundant? (rest (iterate inc 1))))
+
+(defn non-abundant-sums-lazy []
+  (let [limit 28123
+        abundant-set (set (take-while #(< % limit) abundant-numbers-lazy))
+        numbers (range 1 (inc limit))]
+    (->> numbers
+         (map #(if (can-be-sum-of-two-abundant? % abundant-set) 0 %))
+         (reduce +))))
 
 (defn -main []
 ;; Problem 8
