@@ -1,30 +1,76 @@
 (ns lab2.core
   (:gen-class))
 
-(defn trie-new
-  "Create a new empty Trie."
-  []
-  {})
+(defn trie-node
+  ([] {:value nil :children {}})
+  ([value] {:value value :children {}}))
 
-(defn trie-contains?
-  "Check if a word is present in the Trie."
-  [trie word]
-  (get-in trie (map keyword word) :end))
+(defn insert [node value]
+  (if (empty? value)
+    (assoc node :is-end true)
+    (let [curr (first value)
+          next (rest value)
+          child-node (if (contains? (:children node) curr)
+                       (get (:children node) curr)
+                       (trie-node curr))]
+      (assoc node :children (assoc (:children node) curr (insert child-node next))))))
 
-(defn trie-insert
-  "Add a word to the Trie."
-  [trie word]
-  (assoc-in trie (map keyword word) :end))
+  (defn insert-word [root word]
+    (let [existing-node (if (contains? (:children root) (first word))
+                          (get (:children root) (first word))
+                          (trie-node (first word)))]
+      (assoc root :children (assoc (:children root) (first word) (insert existing-node (rest word))))))
 
-(defn trie-remove
-  "Remove a word from the Trie."
-  [trie word]
-  (update-in trie (map keyword word) (constantly nil)))
+(defn search [node value]
+  (if (empty? value)
+    (if (contains? node :is-end)
+      (:is-end node)
+      false)
+    (let [curr (first value)
+          next (rest value)
+          child-node (if (contains? (:children node) curr)
+                       (get (:children node) curr)
+                       false)]
+      (if (false? child-node)
+        false
+        (search child-node next)))))
+
+(defn search-word [root word]
+  (let [existing-node (if (contains? (:children root) (first word))
+                        (get (:children root) (first word))
+                        false)]
+    (if (false? existing-node)
+      false
+      (search existing-node (rest word)))))
+
+(defn seek-and-destroy [node word]
+  (if (empty? word)
+    (if (contains? node :is-end)
+      (= false (:is-end (assoc node :is-end false))) ;; ITMO SOFTWARE OVERENGINEERING
+      false)
+    (let [curr (first word)
+          next (rest word)
+          child-node (if (contains? (:children node) curr)
+                       (get (:children node) curr)
+                       false)]
+      (if (false? child-node)
+        false
+        (seek-and-destroy child-node next)))
+    ))
 
 
+(defn remove-word [root word]
+  (let [existing-node (if (contains? (:children root) (first word))
+                        (get (:children root) (first word))
+                        false)]
+    (if (false? existing-node)
+      false
+      (seek-and-destroy existing-node (rest word))))
+  )
 
+  (defn -main
+    "I don't do a whole lot ... yet."
+    [& args]
+    (insert-word (trie-node) "abc")
+    (insert-word (trie-node) "bcd"))
 
-(defn -main
-  "I don't do a whole lot ... yet."
-  [& args]
-  (println "Hello, World!"))
