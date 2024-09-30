@@ -30,7 +30,7 @@
     (let [trie1 (trie/insert-word (trie/insert-word (trie/trie-node) "hello") "world")
           trie-map (trie/map-trie trie1)
           trie2 (trie/trie-collection trie-map)]
-      (is (= trie1 trie2))))) ;; TODO: define Trie comparator
+      (is (= true (trie/compare-trie trie1 trie2))))))
 
 (deftest test-filter-trie
   (testing "Filter trie, then check if trie is filtered"
@@ -48,16 +48,16 @@
     (let [A (trie/trie-collection ["some" "words" "for" "trie"])
           B (trie/trie-collection ["other" "words"])
           C (trie/trie-collection ["this" "should" "pass"])]
-      (is (= (trie/merge-trie A (trie/merge-trie B C)) (trie/merge-trie (trie/merge-trie A B) C)))))) ;; TODO: define Trie comparator
+      (is (= true (trie/compare-trie (trie/merge-trie A (trie/merge-trie B C)) (trie/merge-trie (trie/merge-trie A B) C)))))))
 
 (deftest property-commutative
   (testing "Check property A + B = B + A"
     (let [A (trie/trie-collection ["a" "b"])
           B (trie/trie-collection ["c" "d"])]
-      (is (= (trie/merge-trie A B) (trie/merge-trie B A)))))) ;; TODO: define Trie comparator
+      (is (= true (trie/compare-trie (trie/merge-trie A B) (trie/merge-trie B A)))))))
 
 (deftest property-neutral
   (testing "Check property A + O = A"
     (let [A (trie/trie-collection ["a"])
           O (trie/trie-node)]
-      (is (= (trie/merge-trie A O) A))))) ;; TODO: define Trie comparator
+      (is (= true (trie/compare-trie (trie/merge-trie A O) A))))))

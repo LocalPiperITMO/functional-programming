@@ -86,6 +86,9 @@
   (trie-collection trie1 (map-trie trie2))
   )
 
+(defn compare-trie [trie1 trie2]
+  (= (set (map-trie trie1)) (set (map-trie trie2))))
+
   (defn -main
     "I don't do a whole lot ... yet."
     [& args]
