@@ -43,3 +43,21 @@
       (is (= (set passed-words) (set (trie/map-trie trie2)))))))
 
 ;; Property Tests
+(deftest property-associative
+  (testing "Check property A + (B + C) = (A + B) + C"
+    (let [trie1 (trie/trie-collection ["some" "words" "for" "trie"])
+          trie2 (trie/trie-collection ["other" "words"])
+          trie3 (trie/trie-collection ["this" "should" "pass"])]
+      (is (= 0 1))))) ;; will hold it for now
+
+(deftest property-commutative
+  (testing "Check property A + B = B + A"
+    (let [trie1 (trie/trie-collection ["a" "b"])
+          trie2 (trie/trie-collection ["c" "d"])]
+      (is (= 0 1))))) ;; will hold it for now
+
+(deftest property-neutral
+  (testing "Check property A + O = A"
+    (let [trie1 (trie/trie-collection ["a"])
+          empty-trie (trie/trie-node)]
+      (is (= 0 1))))) ;; will hold it for now
