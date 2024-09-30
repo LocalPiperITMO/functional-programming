@@ -45,19 +45,19 @@
 ;; Property Tests
 (deftest property-associative
   (testing "Check property A + (B + C) = (A + B) + C"
-    (let [trie1 (trie/trie-collection ["some" "words" "for" "trie"])
-          trie2 (trie/trie-collection ["other" "words"])
-          trie3 (trie/trie-collection ["this" "should" "pass"])]
-      (is (= 0 1))))) ;; will hold it for now
+    (let [A (trie/trie-collection ["some" "words" "for" "trie"])
+          B (trie/trie-collection ["other" "words"])
+          C (trie/trie-collection ["this" "should" "pass"])]
+      (is (= (trie/merge-trie A (trie/merge-trie B C)) (trie/merge-trie (trie/merge-trie A B) C)))))) ;; TODO: define Trie comparator
 
 (deftest property-commutative
   (testing "Check property A + B = B + A"
-    (let [trie1 (trie/trie-collection ["a" "b"])
-          trie2 (trie/trie-collection ["c" "d"])]
-      (is (= 0 1))))) ;; will hold it for now
+    (let [A (trie/trie-collection ["a" "b"])
+          B (trie/trie-collection ["c" "d"])]
+      (is (= (trie/merge-trie A B) (trie/merge-trie B A)))))) ;; TODO: define Trie comparator
 
 (deftest property-neutral
   (testing "Check property A + O = A"
-    (let [trie1 (trie/trie-collection ["a"])
-          empty-trie (trie/trie-node)]
-      (is (= 0 1))))) ;; will hold it for now
+    (let [A (trie/trie-collection ["a"])
+          O (trie/trie-node)]
+      (is (= (trie/merge-trie A O) A))))) ;; TODO: define Trie comparator

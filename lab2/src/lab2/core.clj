@@ -22,8 +22,9 @@
                           (trie-node (first word)))]
       (assoc root :children (assoc (:children root) (first word) (insert existing-node (rest word))))))
 
-(defn trie-collection [collection]
-  (reduce insert-word (trie-node) collection))
+(defn trie-collection 
+  ([collection] (reduce insert-word (trie-node) collection))
+  ([trie collection] (reduce insert-word trie collection)))
 
 (defn search [node value]
   (if (empty? value)
@@ -81,7 +82,9 @@
 (defn filter-trie [trie predicate] 
   (trie-collection (filter predicate (map-trie trie))))
 
-
+(defn merge-trie [trie1 trie2]
+  (trie-collection trie1 (map-trie trie2))
+  )
 
   (defn -main
     "I don't do a whole lot ... yet."
