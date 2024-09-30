@@ -45,28 +45,19 @@
 
 (defn seek-and-destroy [node word]
   (if (empty? word)
-    (if (contains? node :is-end)
-      (= false (:is-end (assoc node :is-end false))) ;; ITMO SOFTWARE OVERENGINEERING
-      false)
+    (assoc node :is-end false)
     (let [curr (first word)
           next (rest word)
-          child-node (if (contains? (:children node) curr)
-                       (get (:children node) curr)
-                       false)]
-      (if (false? child-node)
-        false
-        (seek-and-destroy child-node next)))
-    ))
+          child-node (get-in node [:children curr])]
+      (if child-node
+        (assoc node :children (assoc (:children node) curr (seek-and-destroy child-node next)))
+        node))))
 
-
-(defn remove-word [root word]
-  (let [existing-node (if (contains? (:children root) (first word))
-                        (get (:children root) (first word))
-                        false)]
-    (if (false? existing-node)
-      false
-      (seek-and-destroy existing-node (rest word))))
-  )
+  (defn remove-word [root word]
+    (if (contains? (:children root) (first word))
+      (let [new-children (assoc (:children root) (first word) (seek-and-destroy (get (:children root) (first word)) (rest word)))]
+        (assoc root :children new-children))
+      root))
 
   (defn -main
     "I don't do a whole lot ... yet."
