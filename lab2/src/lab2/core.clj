@@ -6,10 +6,6 @@
   ([] {:value nil :children {}})
   ([value] {:value value :children {}}))
 
-(defn trie-collection [collection]
-  ;; WIP
-  )
-
 (defn insert [node value]
   (if (empty? value)
     (assoc node :is-end true)
@@ -25,6 +21,9 @@
                           (get (:children root) (first word))
                           (trie-node (first word)))]
       (assoc root :children (assoc (:children root) (first word) (insert existing-node (rest word))))))
+
+(defn trie-collection [collection]
+  (reduce insert-word (trie-node) collection))
 
 (defn search [node value]
   (if (empty? value)
@@ -84,7 +83,7 @@
 
 
 
-(defn filter-trie [trie predicate] {})
+(defn filter-trie [trie predicate] nil)
 
 
 
