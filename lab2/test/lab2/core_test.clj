@@ -42,6 +42,13 @@
           passed-words (filter pr2 word-list)]
       (is (= (set passed-words) (set (trie/map-trie trie2)))))))
 
+(deftest test-fold-trie
+  (testing "Folding tries using different functions"
+    (let [test-trie (trie/trie-collection ["a" "apple" "application" "banana" "cherry"])
+          predicate1 #(str %1 "-" %2)]
+      (is (= (trie/fold-trie-left predicate1 test-trie) "a-apple-application-banana-cherry"))
+      (is (= (trie/fold-trie-right predicate1 test-trie) "cherry-banana-application-apple-a"))))) ;; TODO: add left-side-view and right-side-view folds
+
 ;; Property Tests
 (deftest property-associative
   (testing "Check property A + (B + C) = (A + B) + C"

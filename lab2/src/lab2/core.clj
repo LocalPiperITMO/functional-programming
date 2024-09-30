@@ -86,6 +86,14 @@
   (trie-collection trie1 (map-trie trie2))
   )
 
+(defn fold-trie-left [f trie]
+  (let [words (map-trie trie)]
+    (reduce f (first words) (rest words))))
+
+(defn fold-trie-right [f trie]
+  (let [words (reverse (map-trie trie))]
+    (reduce f (first words) (rest words))))
+
 (defn compare-trie [trie1 trie2]
   (= (set (map-trie trie1)) (set (map-trie trie2))))
 
