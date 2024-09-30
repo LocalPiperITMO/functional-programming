@@ -78,12 +78,8 @@
     (traverse trie [] [])))
 
 
-
-
-
-
-
-(defn filter-trie [trie predicate] nil)
+(defn filter-trie [trie predicate] 
+  (trie-collection (filter predicate (map-trie trie))))
 
 
 

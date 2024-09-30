@@ -39,12 +39,7 @@
           pr2 #(pr1 %)
           trie1 (trie/trie-collection word-list)
           trie2 (trie/filter-trie trie1 pr2)
-          passed-words (filter pr2 word-list)
-          failed-words (remove pr2 word-list)]
-      (is (every? #(trie/search-word trie2 %) passed-words))
-      (is (every? #(not (trie/search-word trie2 %)) failed-words))
-      (is (= (count passed-words) (count (trie/map-trie trie2))) "All passed words not present in filtered trie")
-      (is (not= (count failed-words) (count (trie/map-trie trie2))) "Some failed words present in filtered trie")
-      (is (<= (count word-list) (count (trie/map-trie trie2))) "Filtered trie should not contain more words than the original trie"))))
+          passed-words (filter pr2 word-list)]
+      (is (= (set passed-words) (set (trie/map-trie trie2)))))))
 
 ;; Property Tests
