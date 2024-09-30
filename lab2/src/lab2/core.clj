@@ -5,6 +5,10 @@
   ([] {:value nil :children {}})
   ([value] {:value value :children {}}))
 
+(defn trie-collection [collection]
+  ;; WIP
+  )
+
 (defn insert [node value]
   (if (empty? value)
     (assoc node :is-end true)
@@ -58,6 +62,12 @@
       (let [new-children (assoc (:children root) (first word) (seek-and-destroy (get (:children root) (first word)) (rest word)))]
         (assoc root :children new-children))
       root))
+
+(defn map-trie [trie] {})
+
+(defn filter-trie [trie predicate] {})
+
+
 
   (defn -main
     "I don't do a whole lot ... yet."
