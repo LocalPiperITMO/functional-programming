@@ -1,5 +1,6 @@
 (ns lab2.core
-  (:gen-class))
+  (:gen-class) 
+  (:require [clojure.string :as string]))
 
 (defn trie-node
   ([] {:value nil :children {}})
@@ -63,7 +64,25 @@
         (assoc root :children new-children))
       root))
 
-(defn map-trie [trie] {})
+(defn map-trie [trie]
+  (letfn [(traverse [node acc res]
+            (if (empty? (:children node))
+              (if (:is-end node)
+                (conj res (string/join acc))
+                res)
+              (reduce (fn [new-res [char child]]
+                        (traverse child (conj acc char) new-res))
+                      (if (:is-end node)
+                        (conj res (string/join acc))
+                        res)
+                      (:children node))))]
+    (traverse trie [] [])))
+
+
+
+
+
+
 
 (defn filter-trie [trie predicate] {})
 
