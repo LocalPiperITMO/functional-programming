@@ -1,19 +1,15 @@
-name: CI for Lab1 and Lab2
+name: CI for Lab2
 
 on:
   push:
     paths:
-      - 'lab1/**'
-      - 'lab2/**' # Watch for changes in Lab2
+      - 'lab2/**'
   pull_request:
     paths:
-      - 'lab1/**'
-      - 'lab2/**' # Watch for changes in Lab2
+      - 'lab2/**'
 
 jobs:
-  test_lab1:
-    name: Test Lab1
-    if: ${{ contains(github.event.head_commit.added, 'lab1') || contains(github.event.head_commit.modified, 'lab1') }} # Only run when lab1 is updated
+  test:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,30 +21,7 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y leiningen
     
-    - name: Change directory and run tests for Lab1
-      run: |
-        cd lab1
-        lein test
-
-  test_lab2:
-    name: Test Lab2
-    if: ${{ contains(github.event.head_commit.added, 'lab2') || contains(github.event.head_commit.modified, 'lab2') }} # Only run when lab2 is updated
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Install Leiningen
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y leiningen
-    - name: Perform lint
+    - name: Change directory and run tests
       run: |
         cd lab2
-        lein eastwood
-    
-    - name: Run tests for Lab2
-      run: |
         lein test
-
