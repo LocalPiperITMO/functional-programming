@@ -3,37 +3,57 @@
   (:require [clojure.set :refer [difference intersection]]
             [clojure.string :as string]))
 
+;; Time to suffer with abstract Trie API
+;; insert type-independent code here:
+
 (defn trie-node
   ([] {:value nil :children {}})
   ([value] {:value value :children {}}))
 
+(defprotocol Partition
+  (get-first [value])
+  (get-rest [value])
+ )
+
+(extend-protocol Partition
+  clojure.lang.ISeq 
+  (get-first [value] (first value))
+  (get-rest [value] (rest value))
+  clojure.lang.IPersistentVector 
+  (get-first [value] (first value))
+  (get-rest [value] (rest value))
+  java.lang.String
+  (get-first [value] (first value))
+  (get-rest [value] (rest value)) ;; this looks like garbage
+  )
+
 (defn insert [node value]
-  (if (empty? value)
+  (if (empty? value) ;; type-dependent code
     (assoc node :is-end true)
-    (let [curr (first value)
-          next (rest value)
+    (let [curr (get-first value)
+          next (get-rest value)
           child-node (if (contains? (:children node) curr)
                        (get (:children node) curr)
                        (trie-node curr))]
       (assoc node :children (assoc (:children node) curr (insert child-node next))))))
 
   (defn insert-word [root word]
-    (let [existing-node (if (contains? (:children root) (first word))
-                          (get (:children root) (first word))
+    (let [existing-node (if (contains? (:children root) (get-first word))
+                          (get (:children root) (get-first word))
                           (trie-node (first word)))]
-      (assoc root :children (assoc (:children root) (first word) (insert existing-node (rest word))))))
+      (assoc root :children (assoc (:children root) (get-first word) (insert existing-node (get-rest word))))))
 
-(defn trie-collection 
+(defn trie-collection
   ([collection] (reduce insert-word (trie-node) collection))
   ([trie collection] (reduce insert-word trie collection)))
 
 (defn search [node value]
-  (if (empty? value)
+  (if (empty? value) ;; type-dependent code
     (if (contains? node :is-end)
       (:is-end node)
       false)
-    (let [curr (first value)
-          next (rest value)
+    (let [curr (get-first value)
+          next (get-rest value)
           child-node (if (contains? (:children node) curr)
                        (get (:children node) curr)
                        false)]
@@ -42,26 +62,26 @@
         (search child-node next)))))
 
 (defn search-word [root word]
-  (let [existing-node (if (contains? (:children root) (first word))
-                        (get (:children root) (first word))
+  (let [existing-node (if (contains? (:children root) (get-first word))
+                        (get (:children root) (get-first word))
                         false)]
     (if (false? existing-node)
       false
-      (search existing-node (rest word)))))
+      (search existing-node (get-rest word)))))
 
 (defn seek-and-destroy [node word]
   (if (empty? word)
     (assoc node :is-end false)
-    (let [curr (first word)
-          next (rest word)
+    (let [curr (get-first word)
+          next (get-rest word)
           child-node (get-in node [:children curr])]
       (if child-node
         (assoc node :children (assoc (:children node) curr (seek-and-destroy child-node next)))
         node))))
 
   (defn remove-word [root word]
-    (if (contains? (:children root) (first word))
-      (let [new-children (assoc (:children root) (first word) (seek-and-destroy (get (:children root) (first word)) (rest word)))]
+    (if (contains? (:children root) (get-first word))
+      (let [new-children (assoc (:children root) (get-first word) (seek-and-destroy (get (:children root) (get-first word)) (get-rest word)))]
         (assoc root :children new-children))
       root))
 
@@ -69,12 +89,12 @@
   (letfn [(traverse [node acc res]
             (if (empty? (:children node))
               (if (:is-end node)
-                (conj res (string/join acc))
+                (conj res (string/join acc)) ;; type-dependent code
                 res)
               (reduce (fn [new-res [char child]]
-                        (traverse child (conj acc char) new-res))
+                        (traverse child (conj acc char) new-res)) ;; type-dependent code
                       (if (:is-end node)
-                        (conj res (string/join acc))
+                        (conj res (string/join acc)) ;; type-dependent code
                         res)
                       (:children node))))]
     (traverse trie [] [])))
@@ -97,11 +117,11 @@
 
 (defn fold-trie-left [f trie]
   (let [words (map-trie trie)]
-    (reduce f (first words) (rest words))))
+    (reduce f (get-first words) (get-rest words))))
 
 (defn fold-trie-right [f trie]
   (let [words (reverse (map-trie trie))]
-    (reduce f (first words) (rest words))))
+    (reduce f (get-first words) (get-rest words))))
 
 (defn compare-trie [trie1 trie2]
   (= (set (map-trie trie1)) (set (map-trie trie2))))
