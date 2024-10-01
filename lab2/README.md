@@ -1,44 +1,208 @@
-# lab2
+# Лабораторная работа №2
 
-FIXME: description
+---
 
-## Installation
+**Студент:** Сорокин Артём Николаевич  
+**ИСУ:** 367548  
+**Группа:** P3306  
+**Университет:** НИУ ИТМО  
+**Факультет:** Программная инженерия и компьютерная техника  
+**Курс:** 3-й курс  
 
-Download from http://example.com/FIXME.
+---
 
-## Usage
+## Префиксное дерево
 
-FIXME: explanation
+Программа представляет собой реализацию абстрактного бора (префиксного дерева) на языке Clojure. Бор — это структура данных, используемая для эффективного хранения и поиска строк или последовательностей. 
 
-    $ java -jar lab2-0.1.0-standalone.jar [args]
+### Основная логика программы
+1. **Реализация TRIE:**
+   - Для представления узлов TRIE используется функция `trie-node`, которая принимает значение и дочерние узлы.
+```clojure
+(defn trie-node
+  ([] {:value nil :children {}})
+  ([value] {:value value :children {}}))
+```
+   - Для обеспечения работы с различными типами данных в TRIE определен протокол `Partition`, который определяет операции для доступа к первому элементу, оставшимся элементам и проверки на пустоту.
+```clojure
+(defprotocol Partition
+  (get-first [value])
+  (get-rest [value])
+  (check-empty? [value])
+ )
 
-## Options
+(extend-protocol Partition
+  clojure.lang.IPersistentCollection
+  (get-first [value] (first value))
+  (get-rest [value] (rest value)) 
+  (check-empty? [value] (empty? value))
+  java.lang.String
+  (get-first [value] (first value))
+  (get-rest [value] (rest value)) 
+  (check-empty? [value] (empty? value)) 
+  java.lang.Long 
+  (get-first [value] (if (zero? value) 0 (- (long (first (str value))) 48)))
+  (get-rest [value] (if (< value 10) 0 (Long/parseLong (subs (str value) 1)))) 
+  (check-empty? [value] (zero? value)))
+```
+2. **Операции над TRIE:**
+   - `insert-word` вставляет слово в TRIE.
+```clojure
+(defn insert [node value]
+  (if (check-empty? value)
+    (assoc node :is-end true)
+    (let [curr (get-first value)
+          next (get-rest value)
+          child-node (if (contains? (:children node) curr)
+                       (get (:children node) curr)
+                       (trie-node curr))]
+      (assoc node :children (assoc (:children node) curr (insert child-node next))))))
 
-FIXME: listing of options this app accepts.
+  (defn insert-word [root word]
+    (let [existing-node (if (contains? (:children root) (get-first word))
+                          (get (:children root) (get-first word))
+                          (trie-node (get-first word)))]
+      (assoc root :children (assoc (:children root) (get-first word) (insert existing-node (get-rest word))))))
+```
+   - `search-word` выполняет поиск слова в TRIE.
+```clojure
+(defn search [node value]
+  (if (check-empty? value)
+    (if (contains? node :is-end)
+      (:is-end node)
+      false)
+    (let [curr (get-first value)
+          next (get-rest value)
+          child-node (if (contains? (:children node) curr)
+                       (get (:children node) curr)
+                       false)]
+      (if (false? child-node)
+        false
+        (search child-node next)))))
 
-## Examples
+(defn search-word [root word]
+  (let [existing-node (if (contains? (:children root) (get-first word))
+                        (get (:children root) (get-first word))
+                        false)]
+    (if (false? existing-node)
+      false
+      (search existing-node (get-rest word)))))
+```
+   - `remove-word` удаляет слово из TRIE.
+```clojure
+(defn seek-and-destroy [node word]
+  (if (check-empty? word)
+    (assoc node :is-end false)
+    (let [curr (get-first word)
+          next (get-rest word)
+          child-node (get-in node [:children curr])]
+      (if child-node
+        (assoc node :children (assoc (:children node) curr (seek-and-destroy child-node next)))
+        node))))
 
-...
+  (defn remove-word [root word]
+    (if (contains? (:children root) (get-first word))
+      (let [new-children (assoc (:children root) (get-first word) (seek-and-destroy (get (:children root) (get-first word)) (get-rest word)))]
+        (assoc root :children new-children))
+      root))
+```
 
-### Bugs
+3. **Манипуляции с TRIE:**
+      - `map-trie` преобразует TRIE в различные типы данных в зависимости от типов ключей.
+```clojure
+(defn map-trie-string [trie]
+  (letfn [(traverse [node acc res]
+            (if (check-empty? (:children node))
+              (if (:is-end node)
+                (conj res (string/join acc)) ;; type-dependent code
+                res)
+              (reduce (fn [new-res [char child]]
+                        (traverse child (conj acc char) new-res)) ;; type-dependent code
+                      (if (:is-end node)
+                        (conj res (string/join acc)) ;; type-dependent code
+                        res)
+                      (:children node))))]
+    (traverse trie [] []))
+  )
 
-...
+(defn map-trie-number [trie]
+  (letfn [(traverse [node acc res]
+            (if (check-empty? (:children node))
+              (if (:is-end node)
+                (conj res (Long/parseLong (apply str acc)))
+                res)
+              (reduce (fn [new-res [char child]]
+                        (traverse child (conj acc char) new-res))
+                      (if (:is-end node)
+                        (conj res (Long/parseLong (apply str acc)))
+                        res)
+                      (:children node))))]
+    (traverse trie [] [])))
 
-### Any Other Sections
-### That You Think
-### Might be Useful
 
-## License
+  (defn map-trie-any [trie]
+    (letfn [(traverse [node acc res]
+              (if (check-empty? (:children node))
+                (if (:is-end node)
+                  (conj res (:value node))
+                  res)
+                (reduce (fn [new-res [char child]]
+                          (traverse child (conj acc char) new-res))
+                        (if (:is-end node)
+                          (conj res (:value node))
+                          res)
+                        (:children node))))]
+      (traverse trie [] [])))
 
-Copyright © 2024 FIXME
 
-This program and the accompanying materials are made available under the
-terms of the Eclipse Public License 2.0 which is available at
-http://www.eclipse.org/legal/epl-2.0.
+    (defn map-trie [trie]
+      (if (empty? (:children trie))
+        []
+        (let [first-key-type (type (-> trie :children keys first))]
+          (cond
+            (= java.lang.Character first-key-type) (map-trie-string trie)
+            (= java.lang.Long first-key-type) (map-trie-number trie)
+            :else (map-trie-any trie)))))
+```
+   - Фильтрация `filter-trie`, объединение `merge-trie`, пересечение `intersect-trie`, вычитание `subtract-trie`, исключающее ИЛИ `xor-trie`.
+```clojure
+(defn filter-trie [trie predicate] 
+  (trie-collection (filter predicate (map-trie trie))))
 
-This Source Code may also be made available under the following Secondary
-Licenses when the conditions for such availability set forth in the Eclipse
-Public License, v. 2.0 are satisfied: GNU General Public License as published by
-the Free Software Foundation, either version 2 of the License, or (at your
-option) any later version, with the GNU Classpath Exception which is available
-at https://www.gnu.org/software/classpath/license.html.
+(defn merge-trie [trie1 trie2]
+  (trie-collection trie1 (map-trie trie2))
+  )
+(defn intersect-trie [trie1 trie2]
+(trie-collection (intersection (set (map-trie trie1)) (set (map-trie trie2)))))
+
+(defn subtract-trie [trie1 trie2]
+  (trie-collection (difference (set (map-trie trie1)) (set (map-trie trie2)))))
+
+(defn xor-trie [trie1 trie2]
+  (subtract-trie (merge-trie trie1 trie2) (intersect-trie trie1 trie2)))
+```
+   - Сворачивание элементов `fold-trie-left` и `fold-trie-right`.
+```clojure
+(defn fold-trie-left [f trie]
+  (let [words (map-trie trie)]
+    (reduce f (get-first words) (get-rest words))))
+
+(defn fold-trie-right [f trie]
+  (let [words (reverse (map-trie trie))]
+    (reduce f (get-first words) (get-rest words))))
+```
+   - Сравнение двух TRIE `compare-trie`.
+```clojure
+(defn compare-trie [trie1 trie2]
+  (= (set (map-trie trie1)) (set (map-trie trie2))))
+```
+
+### Анализ функций и структур данных
+- **Insert, Search, Remove:** Вставка, поиск и удаление реализованы эффективно, используя рекурсивный подход.
+- **Map-trie:** Функции `map-trie-string`, `map-trie-number`, `map-trie-any` полезны для преобразования TRIE в различные типы данных в зависимости от типов ключей узлов.
+- **Merge, Intersect, Subtract, XOR:** Операции склейки, пересечения, вычитания и исключающего ИЛИ реализованы для работы с TRIE.
+- **Fold-Trie:** Функции `fold-trie-left` и `fold-trie-right` проводят операции свертки по элементам дерева.
+- **Compare-trie:** В функции `compare-trie` осуществляется сравнение двух TRIE на идентичность.
+
+### Тестирование
+Все тесты проходят. Тесты делятся на модульные, логики и свойств. [Ссылка на тесты.](lab2/test/lab2/core-test.clj)
