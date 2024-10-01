@@ -85,7 +85,7 @@
         (assoc root :children new-children))
       root))
 
-(defn map-trie [trie]
+(defn map-trie-string [trie]
   (letfn [(traverse [node acc res]
             (if (check-empty? (:children node))
               (if (:is-end node)
@@ -97,7 +97,49 @@
                         (conj res (string/join acc)) ;; type-dependent code
                         res)
                       (:children node))))]
+    (traverse trie [] []))
+  )
+
+(defn map-trie-number [trie]
+  (letfn [(traverse [node acc res]
+            (if (check-empty? (:children node))
+              (if (:is-end node)
+                (conj res (Long/parseLong (apply str acc)))
+                res)
+              (reduce (fn [new-res [char child]]
+                        (traverse child (conj acc char) new-res))
+                      (if (:is-end node)
+                        (conj res (Long/parseLong (apply str acc)))
+                        res)
+                      (:children node))))]
     (traverse trie [] [])))
+
+
+  (defn map-trie-any [trie]
+    (letfn [(traverse [node acc res]
+              (if (check-empty? (:children node))
+                (if (:is-end node)
+                  (conj res (:value node))
+                  res)
+                (reduce (fn [new-res [char child]]
+                          (traverse child (conj acc char) new-res))
+                        (if (:is-end node)
+                          (conj res (:value node))
+                          res)
+                        (:children node))))]
+      (traverse trie [] [])))
+
+
+    (defn map-trie [trie]
+      (if (empty? (:children trie))
+        []
+        (let [first-key-type (type (-> trie :children keys first))]
+          (cond
+            (= java.lang.Character first-key-type) (map-trie-string trie)
+            (= java.lang.Long first-key-type) (map-trie-number trie)
+            :else (map-trie-any trie)))))
+
+
 
 
 (defn filter-trie [trie predicate] 
