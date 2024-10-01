@@ -26,7 +26,7 @@
   (get-rest [value] (rest value)) 
   (check-empty? [value] (empty? value)) 
   java.lang.Long 
-  (get-first [value] (if (zero? value) 0 (long (first (str value))))) 
+  (get-first [value] (if (zero? value) 0 (- (long (first (str value))) 48))) ;; massive crutch
   (get-rest [value] (if (< value 10) 0 (Long/parseLong (subs (str value) 1)))) 
   (check-empty? [value] (zero? value)))
   
@@ -44,7 +44,7 @@
   (defn insert-word [root word]
     (let [existing-node (if (contains? (:children root) (get-first word))
                           (get (:children root) (get-first word))
-                          (trie-node (first word)))]
+                          (trie-node (get-first word)))]
       (assoc root :children (assoc (:children root) (get-first word) (insert existing-node (get-rest word))))))
 
 (defn trie-collection
