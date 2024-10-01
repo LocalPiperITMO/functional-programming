@@ -13,22 +13,22 @@
 (defprotocol Partition
   (get-first [value])
   (get-rest [value])
+  (check-empty? [value])
  )
 
-(extend-protocol Partition
-  clojure.lang.ISeq 
+(extend-protocol Partition ;; this looks like garbage, but it works
+  clojure.lang.IPersistentCollection
   (get-first [value] (first value))
-  (get-rest [value] (rest value))
-  clojure.lang.IPersistentVector 
-  (get-first [value] (first value))
-  (get-rest [value] (rest value))
+  (get-rest [value] (rest value)) 
+  (check-empty? [value] (empty? value))
   java.lang.String
   (get-first [value] (first value))
-  (get-rest [value] (rest value)) ;; this looks like garbage
+  (get-rest [value] (rest value)) 
+  (check-empty? [value] (empty? value)) 
   )
 
 (defn insert [node value]
-  (if (empty? value) ;; type-dependent code
+  (if (check-empty? value)
     (assoc node :is-end true)
     (let [curr (get-first value)
           next (get-rest value)
@@ -48,7 +48,7 @@
   ([trie collection] (reduce insert-word trie collection)))
 
 (defn search [node value]
-  (if (empty? value) ;; type-dependent code
+  (if (check-empty? value)
     (if (contains? node :is-end)
       (:is-end node)
       false)
@@ -70,7 +70,7 @@
       (search existing-node (get-rest word)))))
 
 (defn seek-and-destroy [node word]
-  (if (empty? word)
+  (if (check-empty? word)
     (assoc node :is-end false)
     (let [curr (get-first word)
           next (get-rest word)
@@ -87,7 +87,7 @@
 
 (defn map-trie [trie]
   (letfn [(traverse [node acc res]
-            (if (empty? (:children node))
+            (if (check-empty? (:children node))
               (if (:is-end node)
                 (conj res (string/join acc)) ;; type-dependent code
                 res)
