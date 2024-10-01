@@ -25,7 +25,11 @@
   (get-first [value] (first value))
   (get-rest [value] (rest value)) 
   (check-empty? [value] (empty? value)) 
-  )
+  java.lang.Long 
+  (get-first [value] (if (zero? value) 0 (long (first (str value))))) 
+  (get-rest [value] (if (< value 10) 0 (Long/parseLong (subs (str value) 1)))) 
+  (check-empty? [value] (zero? value)))
+  
 
 (defn insert [node value]
   (if (check-empty? value)
