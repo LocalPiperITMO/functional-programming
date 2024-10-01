@@ -1,6 +1,7 @@
 (ns lab2.core
   (:gen-class) 
-  (:require [clojure.string :as string]))
+  (:require [clojure.set :refer [difference intersection]]
+            [clojure.string :as string]))
 
 (defn trie-node
   ([] {:value nil :children {}})
@@ -85,6 +86,14 @@
 (defn merge-trie [trie1 trie2]
   (trie-collection trie1 (map-trie trie2))
   )
+(defn intersect-trie [trie1 trie2]
+(trie-collection (intersection (set (map-trie trie1)) (set (map-trie trie2)))))
+
+(defn subtract-trie [trie1 trie2]
+  (trie-collection (difference (set (map-trie trie1)) (set (map-trie trie2)))))
+
+(defn xor-trie [trie1 trie2]
+  (subtract-trie (merge-trie trie1 trie2) (intersect-trie trie1 trie2)))
 
 (defn fold-trie-left [f trie]
   (let [words (map-trie trie)]
