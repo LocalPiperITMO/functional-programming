@@ -26,9 +26,9 @@
   (get-rest [value] (rest value)) 
   (check-empty? [value] (empty? value)) 
   java.lang.Long 
-  (get-first [value] (if (zero? value) 0 (- (long (first (str value))) 48))) ;; massive crutch
-  (get-rest [value] (if (< value 10) 0 (Long/parseLong (subs (str value) 1)))) 
-  (check-empty? [value] (zero? value)))
+  (get-first [value] (if (< value 0) -1 (- (long (first (str value))) 48))) ;; massive crutch
+  (get-rest [value] (if (< value 10) -1 (Long/parseLong (subs (str value) 1)))) 
+  (check-empty? [value] (< value 0)))
   
 
 (defn insert [node value]
@@ -93,12 +93,12 @@
   (letfn [(traverse [node acc res]
             (if (check-empty? (:children node))
               (if (:is-end node)
-                (conj res (string/join acc)) ;; type-dependent code
+                (conj res (string/join acc))
                 res)
               (reduce (fn [new-res [char child]]
-                        (traverse child (conj acc char) new-res)) ;; type-dependent code
+                        (traverse child (conj acc char) new-res))
                       (if (:is-end node)
-                        (conj res (string/join acc)) ;; type-dependent code
+                        (conj res (string/join acc))
                         res)
                       (:children node))))]
     (traverse trie [] []))
