@@ -1,5 +1,6 @@
 (ns lab2.core-test
   (:require [clojure.set :refer [difference intersection union]]
+            [clojure.string :as str]
             [clojure.test :refer [deftest is testing]]
             [clojure.test.check.generators :as gen]
             [lab2.core :as trie]))
@@ -101,13 +102,13 @@
 
 (deftest test-fold-trie
   (testing "Folding tries using different functions"
-    (let [words (generate-words numwords)
+    (let [words (generate-numbers numwords)
           test-trie (trie/trie-collection words)
-          predicate1 #(str %1 "-" %2)
-          left-fold-res (reduce predicate1 words)
-          right-fold-res (reduce predicate1 (reverse words))]
-      (is (= (trie/fold-trie-left predicate1 test-trie) left-fold-res))
-      (is (= (trie/fold-trie-right predicate1 test-trie) right-fold-res)))))
+          pred #(intersection (set %1) (set %2))
+          left-fold-res (reduce pred words)
+          right-fold-res (reduce pred (reverse words))]
+      (is (= (trie/fold-trie-left pred test-trie) left-fold-res))
+      (is (= (trie/fold-trie-right pred test-trie) right-fold-res)))))
 
 ;; Logic Tests
 (deftest logic-merge
