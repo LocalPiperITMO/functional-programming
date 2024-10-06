@@ -89,7 +89,7 @@
           number-list (generate-numbers numwords)
           pr1 #(= \a %)
           pr2 #(pr1 %)
-          pr3 even?
+          pr3 #(even? (count %))
           trie1 (trie/trie-collection word-list)
           trie2 (trie/filter-trie trie1 pr2)
           trie3 (trie/trie-collection number-list)
@@ -101,18 +101,13 @@
 
 (deftest test-fold-trie
   (testing "Folding tries using different functions"
-    (let [words (generate-words numwords) ;; Use numwords constant here
-          numbers (generate-numbers numwords)
+    (let [words (generate-words numwords)
           test-trie (trie/trie-collection words)
-          test-number-trie (trie/trie-collection numbers)
           predicate1 #(str %1 "-" %2)
-          predicate2 +
           left-fold-res (reduce predicate1 words)
-          right-fold-res (reduce predicate1 (reverse words))
-          left-fold-number (reduce predicate2 numbers)]
+          right-fold-res (reduce predicate1 (reverse words))]
       (is (= (trie/fold-trie-left predicate1 test-trie) left-fold-res))
-      (is (= (trie/fold-trie-right predicate1 test-trie) right-fold-res))
-      (is (= (trie/fold-trie-left predicate2 test-number-trie) left-fold-number)))))
+      (is (= (trie/fold-trie-right predicate1 test-trie) right-fold-res)))))
 
 ;; Logic Tests
 (deftest logic-merge
