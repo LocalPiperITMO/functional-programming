@@ -4,6 +4,14 @@
             [clojure.string :as string]))
 
 
+(defn number-transform [n]
+  (let [digits (loop [num n
+                      result []]
+                 (if (zero? num)
+                   result
+                   (recur (quot num 10)
+                          (conj result (mod num 10)))))]
+    (vec (reverse digits))))
 
 
 
@@ -31,7 +39,6 @@
   (check-empty? [value] (empty? value))
   )
 
-;; Updates in Insert Functions
 (defn insert [node value]
   (if (check-empty? value)
     (assoc node :is-end true)
@@ -43,10 +50,13 @@
       (assoc node :children (assoc (:children node) curr (insert child-node next))))))
 
 (defn insert-word [root word]
-  (let [existing-node (if (contains? (:children root) (get-first word))
-                        (get (:children root) (get-first word))
-                        (trie-node (get-first word)))]
-    (assoc root :children (assoc (:children root) (get-first word) (insert existing-node (get-rest word))))))
+  (let [new-word (if (= java.lang.Long (type word))
+                   (number-transform word)
+                   word)
+        existing-node (if (contains? (:children root) (get-first new-word))
+                        (get (:children root) (get-first new-word))
+                        (trie-node (get-first new-word)))]
+    (assoc root :children (assoc (:children root) (get-first new-word) (insert existing-node (get-rest new-word))))))
 
 
 (defn trie-collection
@@ -68,12 +78,15 @@
         (search child-node next)))))
 
 (defn search-word [root word]
-  (let [existing-node (if (contains? (:children root) (get-first word))
-                        (get (:children root) (get-first word))
+  (let [new-word (if (= java.lang.Long (type word))
+                   (number-transform word)
+                   word)
+        existing-node (if (contains? (:children root) (get-first new-word))
+                        (get (:children root) (get-first new-word))
                         false)]
     (if (false? existing-node)
       false
-      (search existing-node (get-rest word)))))
+      (search existing-node (get-rest new-word)))))
 
 (defn seek-and-destroy [node word]
   (if (check-empty? word)
@@ -86,10 +99,15 @@
         node))))
 
   (defn remove-word [root word]
-    (if (contains? (:children root) (get-first word))
-      (let [new-children (assoc (:children root) (get-first word) (seek-and-destroy (get (:children root) (get-first word)) (get-rest word)))]
-        (assoc root :children new-children))
-      root))
+    (let [new-word (if (= java.lang.Long (type word))
+                     (number-transform word)
+                     word)]
+      (if (contains? (:children root) (get-first new-word))
+        (let [new-children (assoc (:children root) (get-first new-word) (seek-and-destroy (get (:children root) (get-first new-word)) (get-rest new-word)))]
+          (assoc root :children new-children))
+        root)
+      )
+    )
 
 (defn map-trie-string [trie]
   (letfn [(traverse [node acc res]
@@ -110,23 +128,16 @@
 (defn map-trie-any [trie]
   (letfn [(traverse [node acc res]
             (if (check-empty? (:children node))
-              ;; If there are no children
               (if (:is-end node)
-                (conj res (vec acc)) ;; Collect the current accumulated path directly as a vector without adding any node value
+                (conj res (vec acc))
                 res)
-              ;; If there are children
               (reduce (fn [new-res [key child]]
-                        (traverse child (conj acc key) new-res)) ;; Accumulate the current character
+                        (traverse child (conj acc key) new-res))
                       (if (:is-end node)
-                        (conj res (vec acc)) ;; Collect the word if it’s an end node
+                        (conj res (vec acc))
                         res)
                       (:children node))))]
     (traverse trie [] [])))
-
-
-
-
-
 
     (defn map-trie [trie]
       (if (empty? (:children trie))
@@ -135,8 +146,6 @@
           (cond
             (= java.lang.Character first-key-type) (map-trie-string trie)
             :else (map-trie-any trie)))))
-
-
 
 
 (defn filter-trie [trie predicate] 
