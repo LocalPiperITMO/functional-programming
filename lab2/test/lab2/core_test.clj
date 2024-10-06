@@ -28,14 +28,14 @@
 (defn generate-small-numbers [n]
   (gen/sample (gen/large-integer* {:min 0, :max 1000}) (+ (rand-int n) 1)))
 
-(defn generate-large-numbers [n]
-  (gen/sample (gen/large-integer* {:min 0, :max 1000000}) (+ (rand-int n) 1)))
+(defn generate-numbers [n]
+  (repeatedly (+ (rand-int n) 1) #(generate-small-numbers (+ (rand-int n)))))
 
 ;; Unit Tests
 (deftest test-add-word
   (testing "Add word and check if it's present"
     (let [word (generate-one-word)
-          number (generate-one-small-number)
+          number [(generate-one-small-number)]
           test-trie (trie/insert-word (trie/trie-node) word)
           test-number-trie (trie/insert-word (trie/trie-node) number)]
       (is (= true (trie/search-word test-trie word)))
@@ -44,7 +44,7 @@
 (deftest test-add-multiple-words
   (testing "Add multiple words and check if they are present"
     (let [words [(generate-one-word) (generate-one-word)]
-          numbers [(generate-one-small-number) (generate-one-large-number)]
+          numbers [[(generate-one-small-number)] [(generate-one-large-number)]]
           test-trie (trie/insert-word (trie/insert-word (trie/trie-node) (first words)) (last words))
           test-number-trie (trie/insert-word (trie/insert-word (trie/trie-node) (first numbers)) (last numbers))]
       (is (every? #(trie/search-word test-trie %) words))
@@ -53,7 +53,7 @@
 (deftest test-remove-word
   (testing "Add and Remove word"
     (let [word (generate-one-word)
-          number (generate-one-large-number)
+          number [(generate-one-large-number)]
           test-trie (trie/remove-word (trie/insert-word (trie/trie-node) word) word)
           test-number-trie (trie/remove-word (trie/insert-word (trie/trie-node) number) number)]
       (is (= false (trie/search-word test-trie word)))
@@ -62,7 +62,7 @@
 (deftest test-map-trie
   (testing "Map trie to collection and check if all words are intact"
     (let [words [(generate-one-word) (generate-one-word)]
-          numbers [(generate-one-small-number) (generate-one-large-number)]
+          numbers [[(generate-one-small-number)] [(generate-one-large-number)]]
           test-trie (trie/insert-word (trie/insert-word (trie/trie-node) (first words)) (last words))
           trie-map (trie/map-trie test-trie)
           test-number-trie (trie/insert-word (trie/insert-word (trie/trie-node) (first numbers)) (last numbers))
@@ -73,7 +73,7 @@
 (deftest test-map-unmap
   (testing "Map trie to collection, then build a new trie from collection, check 2 tries for equality"
     (let [words [(generate-one-word) (generate-one-word)]
-          numbers [(generate-one-small-number) (generate-one-large-number)]
+          numbers [[(generate-one-small-number)] [(generate-one-large-number)]]
           trie1 (trie/insert-word (trie/insert-word (trie/trie-node) (first words)) (last words))
           trie-map (trie/map-trie trie1)
           trie2 (trie/trie-collection trie-map)
@@ -86,7 +86,7 @@
 (deftest test-filter-trie
   (testing "Filter trie, then check if trie is filtered"
     (let [word-list (generate-words numwords)
-          number-list (generate-large-numbers numwords)
+          number-list (generate-numbers numwords)
           pr1 #(= \a %)
           pr2 #(pr1 %)
           pr3 even?
@@ -102,7 +102,7 @@
 (deftest test-fold-trie
   (testing "Folding tries using different functions"
     (let [words (generate-words numwords) ;; Use numwords constant here
-          numbers (generate-small-numbers 100)
+          numbers (generate-numbers numwords)
           test-trie (trie/trie-collection words)
           test-number-trie (trie/trie-collection numbers)
           predicate1 #(str %1 "-" %2)

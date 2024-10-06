@@ -20,21 +20,18 @@
   (check-empty? [value])
  )
 
-(extend-protocol Partition ;; this looks like garbage, but it works
+(extend-protocol Partition
   clojure.lang.IPersistentCollection
   (get-first [value] (first value))
-  (get-rest [value] (rest value)) 
+  (get-rest [value] (rest value))
   (check-empty? [value] (empty? value))
   java.lang.String
   (get-first [value] (first value))
-  (get-rest [value] (rest value)) 
-  (check-empty? [value] (empty? value)) 
-  java.lang.Long 
-  (get-first [value] (if (< value 0) -1 (- (long (first (str value))) 48))) ;; massive crutch
-  (get-rest [value] (if (< value 10) -1 (Long/parseLong (subs (str value) 1)))) 
-  (check-empty? [value] (< value 0)))
-  
+  (get-rest [value] (rest value))
+  (check-empty? [value] (empty? value))
+  )
 
+;; Updates in Insert Functions
 (defn insert [node value]
   (if (check-empty? value)
     (assoc node :is-end true)
@@ -45,11 +42,12 @@
                        (trie-node curr))]
       (assoc node :children (assoc (:children node) curr (insert child-node next))))))
 
-  (defn insert-word [root word]
-    (let [existing-node (if (contains? (:children root) (get-first word))
-                          (get (:children root) (get-first word))
-                          (trie-node (get-first word)))]
-      (assoc root :children (assoc (:children root) (get-first word) (insert existing-node (get-rest word))))))
+(defn insert-word [root word]
+  (let [existing-node (if (contains? (:children root) (get-first word))
+                        (get (:children root) (get-first word))
+                        (trie-node (get-first word)))]
+    (assoc root :children (assoc (:children root) (get-first word) (insert existing-node (get-rest word))))))
+
 
 (defn trie-collection
   ([collection] (reduce insert-word (trie-node) collection))
@@ -108,34 +106,26 @@
     (traverse trie [] []))
   )
 
-(defn map-trie-number [trie]
+
+(defn map-trie-any [trie]
   (letfn [(traverse [node acc res]
             (if (check-empty? (:children node))
+              ;; If there are no children
               (if (:is-end node)
-                (conj res (Long/parseLong (apply str acc)))
+                (conj res (vec acc)) ;; Collect the current accumulated path directly as a vector without adding any node value
                 res)
-              (reduce (fn [new-res [char child]]
-                        (traverse child (conj acc char) new-res))
+              ;; If there are children
+              (reduce (fn [new-res [key child]]
+                        (traverse child (conj acc key) new-res)) ;; Accumulate the current character
                       (if (:is-end node)
-                        (conj res (Long/parseLong (apply str acc)))
+                        (conj res (vec acc)) ;; Collect the word if it’s an end node
                         res)
                       (:children node))))]
     (traverse trie [] [])))
 
 
-  (defn map-trie-any [trie]
-    (letfn [(traverse [node acc res]
-              (if (check-empty? (:children node))
-                (if (:is-end node)
-                  (conj res (:value node))
-                  res)
-                (reduce (fn [new-res [char child]]
-                          (traverse child (conj acc char) new-res))
-                        (if (:is-end node)
-                          (conj res (:value node))
-                          res)
-                        (:children node))))]
-      (traverse trie [] [])))
+
+
 
 
     (defn map-trie [trie]
@@ -144,7 +134,6 @@
         (let [first-key-type (type (-> trie :children keys first))]
           (cond
             (= java.lang.Character first-key-type) (map-trie-string trie)
-            (= java.lang.Long first-key-type) (map-trie-number trie)
             :else (map-trie-any trie)))))
 
 
