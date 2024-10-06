@@ -3,6 +3,10 @@
   (:require [clojure.set :refer [difference intersection]]
             [clojure.string :as string]))
 
+
+
+
+
 ;; Time to suffer with abstract Trie API
 ;; insert type-independent code here:
 
@@ -163,11 +167,11 @@
 
 (defn fold-trie-left [f trie]
   (let [words (map-trie trie)]
-    (reduce f (get-first words) (get-rest words))))
+    (reduce f (first words) (rest words))))
 
 (defn fold-trie-right [f trie]
   (let [words (reverse (map-trie trie))]
-    (reduce f (get-first words) (get-rest words))))
+    (reduce f (first words) (rest words))))
 
 (defn compare-trie [trie1 trie2]
   (= (set (map-trie trie1)) (set (map-trie trie2))))
