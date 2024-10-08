@@ -1,12 +1,12 @@
 (ns lab2.core-test
   (:require [clojure.set :refer [difference intersection union]]
-            [clojure.string :as str]
             [clojure.test :refer [deftest is testing]]
             [clojure.test.check.generators :as gen]
-            [lab2.core :as trie]))
+            [lab2.core :as trie]
+            [java-time.api :as jt]))
 
 ;; Constants
-(def numwords 30)
+(def numwords 100)
 (def lower-case (map char (range (int \a) (inc (int \z)))))
 (def upper-case (map char (range (int \A) (inc (int \Z)))))
 (def all-letters (concat lower-case upper-case))
@@ -113,7 +113,7 @@
 ;; Logic Tests
 (deftest logic-merge
   (testing "Check trie union"
-    (let [words1 (generate-words numwords) ;; Use numwords constant here
+    (let [words1 (generate-words numwords)
           words2 (generate-words numwords)
           words3 (union (set words1) (set words2))
           A (trie/trie-collection words1)
@@ -123,7 +123,7 @@
 
 (deftest logic-intersect
   (testing "Check trie intersection"
-    (let [words1 (generate-words numwords) ;; Use numwords constant here
+    (let [words1 (generate-words numwords)
           words2 (generate-words numwords)
           words3 (intersection (set words1) (set words2))
           A (trie/trie-collection words1)
@@ -133,7 +133,7 @@
 
 (deftest logic-subtract
   (testing "Check trie subtraction"
-    (let [words1 (generate-words numwords) ;; Use numwords constant here
+    (let [words1 (generate-words numwords)
           words2 (generate-words numwords)
           words3 (difference (set words1) (set words2))
           A (trie/trie-collection words1)
@@ -143,7 +143,7 @@
 
 (deftest logic-xor
   (testing "Check trie XOR"
-    (let [words1 (generate-words numwords) ;; Use numwords constant here
+    (let [words1 (generate-words numwords)
           words2 (generate-words numwords)
           words3 (difference (union (set words1) (set words2)) (intersection (set words1) (set words2)))
           A (trie/trie-collection words1)
@@ -154,7 +154,7 @@
 ;; Property Tests
 (deftest property-associative
   (testing "Check property A ⋅ (B ⋅ C) = (A ⋅ B) ⋅ C"
-    (let [A (trie/trie-collection (generate-words numwords)) ;; Use numwords constant here
+    (let [A (trie/trie-collection (generate-words numwords))
           B (trie/trie-collection (generate-words numwords))
           C (trie/trie-collection (generate-words numwords))]
       (is (= true (trie/compare-trie (trie/merge-trie A (trie/merge-trie B C)) (trie/merge-trie (trie/merge-trie A B) C))))
@@ -163,7 +163,7 @@
 
 (deftest property-commutative
   (testing "Check property A ⋅ B = B ⋅ A"
-    (let [A (trie/trie-collection (generate-words numwords)) ;; Use numwords constant here
+    (let [A (trie/trie-collection (generate-words numwords))
           B (trie/trie-collection (generate-words numwords))]
       (is (= true (trie/compare-trie (trie/merge-trie A B) (trie/merge-trie B A))))
       (is (= true (trie/compare-trie (trie/intersect-trie A B) (trie/intersect-trie B A))))
@@ -171,21 +171,61 @@
 
 (deftest property-distributive
   (testing "Check property A & (B | C) = (A & B) | (A & C)"
-    (let [A (trie/trie-collection (generate-words numwords)) ;; Use numwords constant here
+    (let [A (trie/trie-collection (generate-words numwords))
           B (trie/trie-collection (generate-words numwords))
           C (trie/trie-collection (generate-words numwords))]
       (is (= true (trie/compare-trie (trie/intersect-trie A (trie/merge-trie B C)) (trie/merge-trie (trie/intersect-trie A B) (trie/intersect-trie A C))))))))
 
   (deftest property-neutral
     (testing "Check property A | O = A, A & O = O"
-      (let [A (trie/trie-collection (generate-words numwords)) ;; Use numwords constant here
+      (let [A (trie/trie-collection (generate-words numwords))
             O (trie/trie-node)]
         (is (= true (trie/compare-trie (trie/merge-trie A O) A)))
         (is (= true (trie/compare-trie (trie/intersect-trie A O) O))))))
 
   (deftest property-xor
     (testing "Check properties of XOR: A ⊕ A = O, A ⊕ A ⊕ A = A"
-      (let [A (trie/trie-collection (generate-words numwords)) ;; Use numwords constant here
+      (let [A (trie/trie-collection (generate-words numwords))
             O (trie/trie-node)]
         (is (= true (trie/compare-trie (trie/xor-trie A A) O)))
         (is (= true (trie/compare-trie (trie/xor-trie (trie/xor-trie A A) A) A))))))
+
+(deftest property-polymorphism
+  (testing "Polymorphism with strings, numbers, dates and tries"
+    (let [trie (trie/trie-node)
+          string-words ["apple" "banana" "grape"]
+          date-words [[(jt/local-date "2021-01-01") (jt/local-date "2022-02-02") (jt/local-date "2023-03-03")]]
+          number-words [123 456 789]
+          trie-words [[(trie/trie-node) (trie/trie-collection string-words) (trie/trie-collection number-words) (trie/trie-collection date-words)]]
+          string-trie (trie/trie-collection trie string-words)
+          number-trie (trie/trie-collection trie number-words)
+          date-trie (trie/trie-collection trie date-words)
+          trie-trie (trie/trie-collection trie trie-words)]
+      (doseq [word string-words]
+        (is (trie/search-word string-trie word)))
+
+      (doseq [number number-words]
+        (is (trie/search-word number-trie number)))
+
+      (doseq [date date-words]
+        (is (trie/search-word date-trie date)))
+      
+      (doseq [trie-word trie-words]
+        (is (trie/search-word trie-trie trie-word)))
+
+      (let [trie-after-removal (reduce trie/remove-word string-trie string-words)
+            number-trie-after-removal (reduce trie/remove-word number-trie number-words)
+            date-trie-after-removal (reduce trie/remove-word date-trie date-words)
+            trie-trie-after-removal (reduce trie/remove-word trie-trie trie-words)]
+
+        (doseq [word string-words]
+          (is (= false (trie/search-word trie-after-removal word))))
+
+        (doseq [number number-words]
+          (is (= false (trie/search-word number-trie-after-removal number))))
+
+        (doseq [date date-words]
+          (is (= false (trie/search-word date-trie-after-removal date))))
+        
+        (doseq [trie-word trie-words]
+          (is (= false (trie/search-word trie-trie-after-removal trie-word))))))))
