@@ -320,7 +320,7 @@ $collection(map(Trie(S + C))) = Trie(S)$
 
 $N = \sum_{i=0}^{K} {a_i * 10^{K - i}}$
 
-$transform(N) = $ { $a_1, a_2 ... a_K$ } $= word$
+$transform(N)$ = { $a_1, a_2 ... a_K$ } $= word$
 
 Исходный код:
 ```clojure
@@ -348,7 +348,7 @@ $S \neq S'$, так как $S'$ - множество итерируемых об
 
 Вот как это работает:
 
-$filter(Trie(S), P) = Trie(R)$, где $R = $ { $word \in S : P = True$ }
+$filter(Trie(S), P) = Trie(R)$, где $R$ = { $word \in S : P = True$ }
 
 "Под капотом" $filter$ использует функцию $map$, что осуществляет чистку бора:
 
