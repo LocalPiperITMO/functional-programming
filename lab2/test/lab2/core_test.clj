@@ -3,10 +3,7 @@
             [clojure.test :refer [deftest is testing]]
             [clojure.test.check.generators :as gen]
             [lab2.core :as trie]
-            [java-time.api :as jt]
-            [java-time LocalDate LocalDateTime ZoneId]
-            [java-time.format DateTimeFormatter]
-            [java.util Random]))
+            [java-time.api :as jt]))
 
 ;; Constants
 (def numwords 100)
@@ -33,7 +30,7 @@
   (gen/sample (gen/large-integer* {:min 0, :max 1000}) (+ (rand-int n) 1)))
 
 (defn generate-numbers [n]
-  (repeatedly (+ (rand-int n) 1) #(generate-small-numbers (+ (rand-int n)))))
+  (repeatedly (+ (rand-int n) 1) #(generate-small-numbers (+ (rand-int n) 1))))
 
 
 
