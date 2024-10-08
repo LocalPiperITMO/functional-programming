@@ -3,7 +3,10 @@
             [clojure.test :refer [deftest is testing]]
             [clojure.test.check.generators :as gen]
             [lab2.core :as trie]
-            [java-time.api :as jt]))
+            [java-time.api :as jt]
+            [java-time LocalDate LocalDateTime ZoneId]
+            [java-time.format DateTimeFormatter]
+            [java.util Random]))
 
 ;; Constants
 (def numwords 100)
@@ -31,6 +34,8 @@
 
 (defn generate-numbers [n]
   (repeatedly (+ (rand-int n) 1) #(generate-small-numbers (+ (rand-int n)))))
+
+
 
 ;; Unit Tests
 (deftest test-add-word
@@ -193,9 +198,9 @@
 (deftest property-polymorphism
   (testing "Polymorphism with strings, numbers, dates and tries"
     (let [trie (trie/trie-node)
-          string-words ["apple" "banana" "grape"]
+          string-words (generate-words numwords)
           date-words [[(jt/local-date "2021-01-01") (jt/local-date "2022-02-02") (jt/local-date "2023-03-03")]]
-          number-words [123 456 789]
+          number-words (generate-numbers numwords)
           trie-words [[(trie/trie-node) (trie/trie-collection string-words) (trie/trie-collection number-words) (trie/trie-collection date-words)]]
           string-trie (trie/trie-collection trie string-words)
           number-trie (trie/trie-collection trie number-words)

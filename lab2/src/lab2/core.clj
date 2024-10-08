@@ -174,6 +174,7 @@
 (defn compare-trie [trie1 trie2]
   (= (set (map-trie trie1)) (set (map-trie trie2))))
 
+  #_{:clj-kondo/ignore [:unused-binding]}
   (defn -main
     "I don't do a whole lot ... yet."
     [& args]
