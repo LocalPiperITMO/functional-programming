@@ -1,4 +1,4 @@
-# lab3
+# lab3-fixed
 
 FIXME: description
 
@@ -10,7 +10,7 @@ Download from http://example.com/FIXME.
 
 FIXME: explanation
 
-    $ java -jar lab3-0.1.0-standalone.jar [args]
+    $ java -jar lab3-fixed-0.1.0-standalone.jar [args]
 
 ## Options
 

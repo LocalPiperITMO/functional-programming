@@ -1,8 +1,8 @@
-(ns lab3.core
+(ns lab3-fixed.core
   (:require [clojure.string :as str]
             [clojure.tools.cli :refer [parse-opts]]
-            [lab3.linear :as linear]
-            [lab3.lagrange :as lagrange])
+            [lab3-fixed.linear :as linear]
+            [lab3-fixed.lagrange :as lagrange])
   (:gen-class))
 
 (def cli-options
@@ -23,24 +23,28 @@
   (let [sorted-points (sort-by first points)]
     ;; Linear interpolation
     (when (or (= algorithm "linear") (= algorithm "both"))
-      (doseq [[p1 p2] (partition 2 1 sorted-points)]
-        (let [interp (linear/linear-interpolation [p1 p2] step)
+      (when (>= (count sorted-points) 2)
+        (let [[p1 p2] (take-last 2 sorted-points)
+              interp (linear/linear-interpolation [p1 p2] step)
               x-values (map first interp)
               y-values (map second interp)]
           (println (format "Linear interpolation (X in range [%.3f, %.3f]):"
                            (first x-values) (last x-values)))
-          (println (linear/format-linear-output x-values y-values)))))
+          (println (linear/format-linear-output x-values y-values)))
+        )
+      )
     ;; Lagrange interpolation
     (when (or (= algorithm "lagrange") (= algorithm "both"))
-      (doseq [window (partition window-size 1 sorted-points)]
-        (let [start-x (first (map first window))
-              end-x (last (map first window))
-              interp (lagrange/lagrange-interpolation window step start-x end-x)
-              x-values (map first interp)
-              y-values (map second interp)]
-          (println (format "Lagrange interpolation (X in range [%.3f, %.3f]):"
-                           start-x end-x))
-          (println (lagrange/format-lagrange-output x-values y-values)))))))
+        (when (>= (count sorted-points) window-size)
+          (let [last-window (take-last window-size sorted-points)
+                start-x (first (map first last-window))
+                end-x (last (map first last-window))
+                interp (lagrange/lagrange-interpolation last-window step start-x end-x)
+                x-values (map first interp)
+                y-values (map second interp)]
+            (println (format "Lagrange interpolation (X in range [%.3f, %.3f]):"
+                             start-x end-x))
+            (println (lagrange/format-lagrange-output x-values y-values)))))))
 
 (defn handle-input [step algorithm window-size]
   (loop [points []]
@@ -72,3 +76,4 @@
               (println "No input points provided. Exiting...")
               (let [points (map parse-line input-lines)]
                 (process-input points step algorithm window-size)))))))))
+

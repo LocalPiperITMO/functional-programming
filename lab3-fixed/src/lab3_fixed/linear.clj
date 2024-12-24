@@ -1,4 +1,4 @@
-(ns lab3.linear
+(ns lab3-fixed.linear
   (:require [clojure.string :as str]))
 
 (defn linear-interpolation [points step]

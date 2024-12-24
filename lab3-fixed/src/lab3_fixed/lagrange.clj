@@ -1,4 +1,4 @@
-(ns lab3.lagrange
+(ns lab3-fixed.lagrange
   (:require [clojure.string :as str]))
 
 (defn lagrange-polynomial [points x]

@@ -1,6 +1,6 @@
-(ns lab3.core-test
+(ns lab3-fixed.core-test
   (:require [clojure.test :refer :all]
-            [lab3.core :refer :all]))
+            [lab3-fixed.core :refer :all]))
 
 (deftest a-test
   (testing "FIXME, I fail."
