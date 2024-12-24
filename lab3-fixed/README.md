@@ -37,4 +37,4 @@
 Язык - Clojure.
 
 ## Тестирование
-Все тесты проходят. [Ссылка на тесты.](lab3-fixed/test/lab3_fixed/core-test.clj)
+Все тесты проходят. [Ссылка на тесты.](test/lab3_fixed/core-test.clj)
