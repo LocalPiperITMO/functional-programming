@@ -1,12 +1,12 @@
-name: CI for Lab2
+name: CI for Lab3
 
 on:
   push:
     paths:
-      - 'lab2/**'
+      - 'lab3-fixed/**'
   pull_request:
     paths:
-      - 'lab2/**'
+      - 'lab3-fixed/**'
 
 jobs:
   test:
@@ -23,10 +23,10 @@ jobs:
     
     - name: Change directory and run linting
       run: |
-        cd lab2
+        cd lab3-fixed
         lein eastwood
     
     - name: Change directory and run tests
       run: |
-        cd lab2
+        cd lab3-fixed
         lein test
