@@ -1,44 +1,40 @@
-# lab3-fixed
+# Лабораторная работа №3
 
-FIXME: description
+---
 
-## Installation
+**Студент:** Сорокин Артём Николаевич  
+**ИСУ:** 367548  
+**Группа:** P3306  
+**Университет:** НИУ ИТМО  
+**Факультет:** Программная инженерия и компьютерная техника  
+**Курс:** 3-й курс  
 
-Download from http://example.com/FIXME.
+---
+# Содержание
 
-## Usage
 
-FIXME: explanation
+1. [Описание лабораторной работы](#описание-лабораторной-работы)  
+2. [Интерполяция](#интерполяция)
+    - [Линейная интерполяция](#линейная-интерполяция)
+    - [Интерполяция Лагранжа](#интерполяция-лагранжа)
+3. [Тестирование](#тестирование)  
 
-    $ java -jar lab3-fixed-0.1.0-standalone.jar [args]
 
-## Options
+## Описание лабораторной работы
 
-FIXME: listing of options this app accepts.
+Цель: получить навыки работы с вводом/выводом, потоковой обработкой данных, командной строкой.
+В рамках лабораторной работы вам предлагается повторно реализовать лабораторную работу по предмету "Вычислительная математика" посвящённую интерполяции (в разные годы это лабораторная работа 3 или 4) со следующими дополнениями:
 
-## Examples
+- обязательно должна быть реализована линейная интерполяция;
+- настройки алгоритма интерполяции и выводимых данных должны задаваться через аргументы командной строки:
+  - какие алгоритмы использовать (в том числе два сразу);
+  - частота дискретизации результирующих данных;
+  - и т.п.;
+- входные данные должны задаваться в текстовом формате на подобии ".csv" (к примеру x;y\n или x\ty\n) и подаваться на стандартный ввод, входные данные должны быть отсортированы по возрастанию x;
+- выходные данные должны подаваться на стандартный вывод;
+- программа должна работать в потоковом режиме (пример -- cat | grep 11), это значит, что при запуске программы она должна ожидать получения данных на стандартный ввод, и, по мере получения достаточного количества данных, должна выводить рассчитанные точки в стандартный вывод;
 
-...
+Язык - Clojure.
 
-### Bugs
-
-...
-
-### Any Other Sections
-### That You Think
-### Might be Useful
-
-## License
-
-Copyright © 2024 FIXME
-
-This program and the accompanying materials are made available under the
-terms of the Eclipse Public License 2.0 which is available at
-http://www.eclipse.org/legal/epl-2.0.
-
-This Source Code may also be made available under the following Secondary
-Licenses when the conditions for such availability set forth in the Eclipse
-Public License, v. 2.0 are satisfied: GNU General Public License as published by
-the Free Software Foundation, either version 2 of the License, or (at your
-option) any later version, with the GNU Classpath Exception which is available
-at https://www.gnu.org/software/classpath/license.html.
+## Тестирование
+Все тесты проходят. [Ссылка на тесты.](lab3-fixed/test/lab3_fixed/core-test.clj)
